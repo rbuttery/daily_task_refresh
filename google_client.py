@@ -8,8 +8,8 @@ from datetime import datetime, timedelta
 import pytz
 import json
 
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 class GoogleClient:
     """
