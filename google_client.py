@@ -24,48 +24,11 @@ class GoogleClient:
         self.creds = self.__auth()
         self.calendar_service = build("calendar", "v3", credentials=self.creds)
         self.tasks_service = build("tasks", "v1", credentials=self.creds)
-
-    # def __auth(self):
-    #     """
-    #     Private method to authenticate the Google API client.
-    #     """
-    #     creds = None
-        
-    #     # Load credentials from the environment variable if it exists
-    #     google_creds = os.getenv("GOOGLE_CREDS")
-    #     if google_creds:
-    #         creds_info = json.loads(google_creds)
-    #         creds = Credentials.from_authorized_user_info(creds_info['installed'], self.SCOPES)
-
-    #     if os.path.exists("token.json"):
-    #         creds = Credentials.from_authorized_user_file("token.json", self.SCOPES)
-
-    #     if not creds or not creds.valid:
-    #         if creds and creds.expired and creds.refresh_token:
-    #             creds.refresh(Request())
-    #         else:
-    #             flow = InstalledAppFlow.from_client_secrets_file("credentials.json", self.SCOPES)
-    #             creds = flow.run_local_server(port=50567)
-    #         with open("token.json", "w") as token:
-    #             token.write(creds.to_json())
-
-    #     return creds
-    # def __auth(self):
-    #     """
-    #     Private method to authenticate the Google API client.
-    #     """
-    #     creds = None
-    #     creds_json = os.getenv("GOOGLE_CREDS")  # Assuming 'GOOGLE_CREDS' contains the client configuration JSON
-    #     if creds_json:
-    #         client_config = json.loads(creds_json)
-    #         flow = InstalledAppFlow.from_client_config(client_config, self.SCOPES)
-    #         creds = flow.run_local_server(port=0)  # This will open a new browser tab for authentication
-
-    #     return creds
     
     def __auth(self):
         """
         Private method to authenticate the Google API client.
+        #### Uses environment variables GOOGLE_CREDS and GOOGLE_TOKEN
         """
         creds = None
         
@@ -150,7 +113,6 @@ class GoogleClient:
         events = self.get_day_events(calendar_id=calendar_id, day=day, timezone=timezone)
         return self.format_events_as_markdown(events)
 
-    
     
 
     # Google Tasks methods
@@ -261,8 +223,4 @@ class GoogleClient:
             print(f"An error occurred while creating the task: {e}")
             return None
 
-if __name__ == "__main__":
-    google_client = GoogleClient()
-    
-    print(google_client.list_tasks()[0])
     

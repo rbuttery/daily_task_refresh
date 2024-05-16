@@ -9,19 +9,19 @@ from google_client import GoogleClient
 
 
 
-# @st.cache_data()
-# def list_notion_tasks_by_google_task_id():
-#         # Query the notion "Items" database
-#         notion_items = NotionClient().get_database_rows(os.getenv("NOTION_DATABASE_ID"))['results']
+@st.cache_data()
+def list_notion_tasks_by_google_task_id():
+        # Query the notion "Items" database
+        notion_items = NotionClient().get_database_rows(os.getenv("NOTION_DATABASE_ID"))['results']
         
-#         def try_task_id(task):
-#             try:
-#                 return task['properties']['Task ID']['rich_text'][0]['text']['content']
-#             except:
-#                 return None
+        def try_task_id(task):
+            try:
+                return task['properties']['Task ID']['rich_text'][0]['text']['content']
+            except:
+                return None
 
-#         # This list contains unique task ids from the Notion Items database
-#         return list(set([i for i in [try_task_id(x) for x in notion_items] if i != None]))
+        # This list contains unique task ids from the Notion Items database
+        return list(set([i for i in [try_task_id(x) for x in notion_items] if i != None]))
     
 
 # def push_google_tasks_to_notion():
