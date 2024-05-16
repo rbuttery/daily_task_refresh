@@ -83,5 +83,6 @@ st.title("Google Tasks to Notion")
 
 def test():
     st.write("Hello World")
+    st.write(list_notion_tasks_by_google_task_id())
 
 st.button("Push Google Tasks to Notion", on_click=test)
