@@ -8,6 +8,9 @@ from datetime import datetime, timedelta
 import pytz
 import json
 
+from dotenv import load_dotenv
+load_dotenv()
+
 class GoogleClient:
     """
     A class for interacting with Google Calendar and Tasks APIs.
@@ -22,34 +25,72 @@ class GoogleClient:
         self.calendar_service = build("calendar", "v3", credentials=self.creds)
         self.tasks_service = build("tasks", "v1", credentials=self.creds)
 
+    # def __auth(self):
+    #     """
+    #     Private method to authenticate the Google API client.
+    #     """
+    #     creds = None
+        
+    #     # Load credentials from the environment variable if it exists
+    #     google_creds = os.getenv("GOOGLE_CREDS")
+    #     if google_creds:
+    #         creds_info = json.loads(google_creds)
+    #         creds = Credentials.from_authorized_user_info(creds_info['installed'], self.SCOPES)
+
+    #     if os.path.exists("token.json"):
+    #         creds = Credentials.from_authorized_user_file("token.json", self.SCOPES)
+
+    #     if not creds or not creds.valid:
+    #         if creds and creds.expired and creds.refresh_token:
+    #             creds.refresh(Request())
+    #         else:
+    #             flow = InstalledAppFlow.from_client_secrets_file("credentials.json", self.SCOPES)
+    #             creds = flow.run_local_server(port=50567)
+    #         with open("token.json", "w") as token:
+    #             token.write(creds.to_json())
+
+    #     return creds
+    # def __auth(self):
+    #     """
+    #     Private method to authenticate the Google API client.
+    #     """
+    #     creds = None
+    #     creds_json = os.getenv("GOOGLE_CREDS")  # Assuming 'GOOGLE_CREDS' contains the client configuration JSON
+    #     if creds_json:
+    #         client_config = json.loads(creds_json)
+    #         flow = InstalledAppFlow.from_client_config(client_config, self.SCOPES)
+    #         creds = flow.run_local_server(port=0)  # This will open a new browser tab for authentication
+
+    #     return creds
+    
     def __auth(self):
         """
         Private method to authenticate the Google API client.
         """
         creds = None
+        
+        # Check if the token is available and valid from the environment
+        token_json = os.getenv("GOOGLE_TOKEN")
 
-        if os.path.exists("token.json"):
-            creds = Credentials.from_authorized_user_file("token.json", self.SCOPES)
-
+        if token_json:
+            creds = Credentials.from_authorized_user_info(json.loads(token_json), self.SCOPES)
+        
+        # Refresh token if it's expired
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        
+        # If no valid credentials, initiate OAuth flow
         if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file("credentials.json", self.SCOPES)
-                creds = flow.run_local_server(port=50567)
-            with open("token.json", "w") as token:
-                token.write(creds.to_json())
+            creds_json = os.getenv("GOOGLE_CREDS")
+            if creds_json:
+                client_config = json.loads(creds_json)
+                flow = InstalledAppFlow.from_client_config(client_config, self.SCOPES)
+                creds = flow.run_local_server(port=0)
+            
+            # Save the refreshed or new token in environment (simulation)
+            os.environ["GOOGLE_TOKEN"] = creds.to_json()
 
         return creds
-    
-    def refresh_token(self):
-        """
-        Method to refresh the access token.
-        """
-        if self.creds and self.creds.expired and self.creds.refresh_token:
-            self.creds.refresh(Request())
-            with open("token.json", "w") as token:
-                token.write(self.creds.to_json())
 
     # Google Calendar methods
     def list_calendars(self):
@@ -223,5 +264,5 @@ class GoogleClient:
 if __name__ == "__main__":
     google_client = GoogleClient()
     
-    # print(google_client.list_tasks()[0])
+    print(google_client.list_tasks()[0])
     
