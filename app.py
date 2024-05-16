@@ -1,8 +1,8 @@
 import streamlit as st
 import os
 
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 from notion_client import NotionClient  
 from google_client import GoogleClient
@@ -85,8 +85,6 @@ from google_client import GoogleClient
 st.title("Google Tasks to Notion")
 
 def test():
-    import json
-    
-    creds = GoogleClient().get_credentials()
+    st.write("Hello World")
 
 st.button("Push Google Tasks to Notion", on_click=test)

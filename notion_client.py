@@ -5,15 +5,15 @@ import os
 import requests
 import json
 
-# setup a log under notion.log
-import logging
-logging.basicConfig(filename="notion.log", level=logging.INFO)
+# # setup a log under notion.log
+# import logging
+# logging.basicConfig(filename="notion.log", level=logging.INFO)
 
 # create a class to interact with the Notion API
 class NotionClient:
     def __init__(self):
         # update the log
-        logging.info("Initializing NotionClient")
+        # logging.info("Initializing NotionClient")
         self.token = os.getenv("NOTION_API_KEY")
         self.url = "https://api.notion.com/v1"
         self.headers = {
