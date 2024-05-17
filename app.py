@@ -4,7 +4,7 @@ import requests
 
 # Get the environment variable
 api_url = 'https://tg7js80g-5000.use.devtunnels.ms'
-api_url = 'http://127.0.0.1:5000'
+# api_url = 'http://127.0.0.1:5000'
 
 col1, col2, col3 = st.columns(3)
 
