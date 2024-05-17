@@ -1,88 +1,36 @@
 import streamlit as st
 import os
+import requests
 
-from notion_client import NotionClient  
-from google_client import GoogleClient
+# Get the environment variable
+api_url = 'https://tg7js80g-5000.use.devtunnels.ms'
+api_url = 'http://127.0.0.1:5000'
 
+col1, col2, col3 = st.columns(3)
 
-
-@st.cache_data()
-def list_notion_tasks_by_google_task_id():
-        # Query the notion "Items" database
-        notion_items = NotionClient().get_database_rows(os.getenv("NOTION_DATABASE_ID"))['results']
+with col1:
+    # create a button for each endpoint:
+    if st.button('Push to Google Tasks', use_container_width=True):
         
-        def try_task_id(task):
-            try:
-                return task['properties']['Task ID']['rich_text'][0]['text']['content']
-            except:
-                return None
-
-        # This list contains unique task ids from the Notion Items database
-        return list(set([i for i in [try_task_id(x) for x in notion_items] if i != None]))
+        with st.spinner('Pushing tasks to Google Tasks...'):
+            requests.get(api_url + '/push_to_google_tasks')
+            st.success('Pushed tasks to Google Tasks!')
+            st.balloons()
+with col2:
+    if st.button('Update Google Tasks', use_container_width=True):
+        with st.spinner('Updating Google Tasks...'):
+            requests.get(api_url + '/update_google_tasks')
+            st.balloons()
+            st.success('Updated Google Tasks!')
+with col3:     
+    if st.button('Push to Notion', use_container_width=True):
+        with st.spinner('Pushing tasks to Notion...'):
+            requests.get(api_url + '/push_to_notion')
+            st.success('Pushed tasks to Notion!')
+            st.balloons()
     
-
-def push_google_tasks_to_notion():
-    current_notion_ids = list_notion_tasks_by_google_task_id()
-    for task in GoogleClient().list_tasks():
-        
-        # if the google task id is already in notion, skip it
-        if task['id'] in current_notion_ids:
-            # logging.info(f"Task {task['id']} already exists in Notion")
-            continue
-        
-        # if google task does not have a title skip it
-        if task['title'] == '':
-            # logging.info(f"Task {task['id']} does not have a title")
-            continue
-            
-        else:
-            icon = {'type': 'external',
-                    'external': {'url': 'https://www.notion.so/icons/square_green.svg'}}
-            
-            props = {
-                "Item": {
-                    "title": [
-                        {
-                            "text": {
-                                "content": task['title']
-                            }
-                        }
-                    ]
-                },
-                "Done": {
-                    "checkbox": False if task['status'] == "needsAction" else True
-                },
-                "Task ID": {
-                    "rich_text": [
-                        {
-                            "text": {
-                                "content": task['id']
-                            }
-                        }
-                    ]
-                }
-            }
-            
-            try:
-                props['Due'] = {
-                        'type': 'date',
-                        'date': {
-                            'start': task['due'].replace('Z', '') if task['due'] else None,
-                            'end': None,
-                            'time_zone': None
-                        }
-                    }
-            except KeyError:
-                pass
-            
-            db_id = os.getenv("NOTION_DATABASE_ID")
-            new_page = NotionClient().create_page(database_id=db_id, properties=props, icon=icon)
-            # logging.info(f"Created task {task['id']} in Notion")
-        
-st.title("Google Tasks to Notion")
-
-def test():
-    st.write("Hello World")
-    st.write(list_notion_tasks_by_google_task_id())
-
-st.button("Push Google Tasks to Notion", on_click=test)
+if st.button('Sync All', use_container_width=True):
+    with st.spinner('Syncing all tasks...'):    
+        requests.get(api_url + '/sync_all')
+        st.success('Synced all tasks!')    
+        st.balloons()    
